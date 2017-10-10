@@ -13,7 +13,7 @@
 
 bool GLOBAL_EXIT = 0; //Using this in order to have exec_exit properly close program by ending the while loop in main
 
-void exec_help(int arr_size, std::string curr_cmds[])
+ void exec_help(int arr_size, std::string curr_cmds[])
 {
     std::cout << "The current commands available in this shell are: " << std::endl;
     for(int i = 0; i < arr_size; i++)
@@ -51,17 +51,32 @@ void exec_pwd()
 
 void exec_cd(std::string destination)
 {
-    chdir(destination.c_str());
+    errno = 0;
+    try //If the directory does not exist, chdir won't crash us, but this lets us alert user that their dir
+        //isnt there
+    {
+        chdir(destination.c_str());
+        
+        if(errno != 0)
+            throw 1;
+    }
+    
+    catch(int bad_directory)
+    {
+        perror("main");
+        //std::cout << ">Error. Directory does not exist." << std::endl;
+    }
+    
 }
 
 void exec_error()
 {
-    std::cout << "Error: command not found." << std::endl;
+    std::cout << ">Error: command not found." << std::endl;
 }
 
 void exec_ls()
 {
-    
+    system("ls");
 }
 
 std::string get_command()
